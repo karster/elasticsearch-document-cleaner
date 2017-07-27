@@ -42,6 +42,9 @@ Index name. If empty get list all indices.
 
 -f, --force
 Don't ask for confirm to delete indexes.
+
+--help
+Print this help.
 "
 }
 
