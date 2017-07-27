@@ -73,9 +73,9 @@ function deleteDocuments
     count=$(getCount)
 
     if [ "$count" != "0" ] && [ "$count" != "" ]; then
-        printf "\n"
 
         if [ "${FORCE}" -eq "0" ]; then
+            printf "\n"
             printf "${FGDANGER}Are you sure you want to delete these ${BOLD}${count}${DEFAULT}${FGDANGER} documents${DEFAULT} [Y/n]: "
             read -r
         else 
@@ -149,7 +149,6 @@ if [ "$INDEX" == "" ]; then
     printInfo "Finding indices..."
     findIndices
 else
-
     printInfo "Finding documents..."
     deleteDocuments
 fi
