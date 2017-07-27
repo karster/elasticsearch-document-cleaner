@@ -1,7 +1,7 @@
 prefix=/usr/local
 
 # files that need mode 755
-EXEC_FILES=relasticsearch-document-cleaner
+EXEC_FILES=elasticsearch-document-cleaner
 
 all:
 	@echo "usage: make install"
