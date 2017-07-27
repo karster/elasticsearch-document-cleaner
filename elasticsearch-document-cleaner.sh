@@ -1,23 +1,48 @@
 #!/bin/bash
 
-NORMAL=$(echo "\033[m")
+DEFAULT=$(echo "\033[m")
 BOLD=$(echo "\033[1m")
-YELLOW=$(echo "\033[33m")
-GREEN=$(echo "\033[32m")
-FGRED=$(echo "\033[41m")
+WARNING=$(echo "\033[33m")
+SUCCESS=$(echo "\033[32m")
+DANGER=$(echo "\033[31m")
+INFO=$(echo "\033[36m")
+FGDANGER=$(echo "\033[41m")
 
-function printTitle
+function printInfo
 {
-	printf "\n"
-    printf "${YELLOW}$1${NORMAL}"
-    printf "\n"
+    printf "\n${WARNING}$1${DEFAULT}\n"
 }
 
-function printDone 
+function printSuccess
 {
-    printf "\n"
-    printf "${GREEN}Done${NORMAL}"
-    printf "\n"
+    printf "\n${SUCCESS}$1${DEFAULT}\n"
+}
+
+function printDefault
+{
+    printf "\n${DEFAULT}$1${DEFAULT}\n"
+}
+
+function printHelp
+{
+    printf "\nusage:
+elasticsearch-document-cleaner [ -f | -h | -p | -d | -i ]
+
+-d <number>, --days <number>
+Defines days, default 14.
+
+-p <number>, --port <number>
+Port, default 9200.
+
+-h <string>, --host <string>
+Host name, default \"localhost\".
+
+-i <string>, --index <string>
+Index name. If empty get list all indices.
+
+-f, --force
+Don't ask for confirm to delete indexes.
+"
 }
 
 function getQuery
@@ -43,54 +68,30 @@ function findIndices
     curl -XGET ${HOST}:${PORT}/_cat/indices 2>&1
 }
 
-function printHelp
-{
-    printf "\nusage:
-elasticsearch-document-cleaner [ -f | -h | -p | -d | -i ]
-
--d <number>, --days <number>
-Defines days, default 14.
-
--p <9200>, --port <9200>
-Port, default 9200.
-
--h <localhost>, --host <localhost>
-Host name, default \"localhost\".
-
--i <index>, --index <index>
-Index name. If empty get list all indices.
-
--f, --force
-Don't ask for confirm to delete indexes.
-"
-}
-
 function deleteDocuments
 {
     count=$(getCount)
 
-    if [ "$count" != "0" ]; then
+    if [ "$count" != "0" ] && [ "$count" != "" ]; then
         printf "\n"
 
         if [ "${FORCE}" -eq "0" ]; then
-            printf "${FGRED}Are you sure you want to delete these ${BOLD}${count}${NORMAL}${FGRED} documents${NORMAL} [Y/n]: "
+            printf "${FGDANGER}Are you sure you want to delete these ${BOLD}${count}${DEFAULT}${FGDANGER} documents${DEFAULT} [Y/n]: "
             read -r
         else 
             REPLY="y"
         fi
 
         if [ "$REPLY" == "y" ] || [ "$REPLY" == "Y" ]; then
-            printSubject "Deleting documents..."
+            printInfo "Deleting documents..."
             deleted=$(curl -XPOST ${HOST}:${PORT}/${INDEX}/_delete_by_query -H 'Content-Type: application/json' -d"`getQuery ${DATE}`" 2>&1 | grep -oP 'deleted":(\d+)' | grep -oP '(\d+)')
-            printf "\n"
-            printf "${GREEN}${deleted} documents are removed${NORMAL}"
+            printSuccess "${deleted} documents are removed"
         else
-            printf "\n"
-            printf "Skip..."
+            printDefault "Skip..."
         fi
 
     else
-        printf "No documents find"
+        printDefault "No documents find"
     fi
 }
 
@@ -127,7 +128,7 @@ while [[ $# -gt 0 ]]; do
         ;;
 
         *)
-            printTitle "ElasticSearch Document Cleaner"
+            printInfo "ElasticSearch Document Cleaner"
             printHelp
             exit 0
         ;;
@@ -142,14 +143,14 @@ else
     DATE="$(date -v-${DAYS}d +%Y-%m-%d)"
 fi
 
-printTitle "ElasticSearch Document Cleaner"
+printInfo "ElasticSearch Document Cleaner"
 
 if [ "$INDEX" == "" ]; then
-    printTitle "Finding indices..."
+    printInfo "Finding indices..."
     findIndices
 else
 
-    printTitle "Finding documents..."
+    printInfo "Finding documents..."
     deleteDocuments
 fi
 
