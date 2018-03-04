@@ -63,7 +63,7 @@ function getQuery
 
 function getCount
 {
-    curl -XGET ${HOST}:${PORT}/${INDEX}/_count -H 'Content-Type: application/json' -d"`getQuery ${DATE}`" 2>&1 | grep -oP 'count":(\d+)' | grep -oP '(\d+)'
+    curl -XGET ${HOST}:${PORT}/${INDEX}/_count -H 'Content-Type: application/json' -d"`getQuery ${DATE}`" 2>&1 | grep -Eo 'count":(\d+)' | grep -Eo '(\d+)'
 }
 
 function findIndices
@@ -87,7 +87,7 @@ function deleteDocuments
 
         if [ "$REPLY" == "y" ] || [ "$REPLY" == "Y" ]; then
             printInfo "Deleting documents..."
-            deleted=$(curl -XPOST ${HOST}:${PORT}/${INDEX}/_delete_by_query -H 'Content-Type: application/json' -d"`getQuery ${DATE}`" 2>&1 | grep -oP 'deleted":(\d+)' | grep -oP '(\d+)')
+            deleted=$(curl -XPOST ${HOST}:${PORT}/${INDEX}/_delete_by_query -H 'Content-Type: application/json' -d"`getQuery ${DATE}`" 2>&1 | grep -Eo 'deleted":(\d+)' | grep -Eo '(\d+)')
             printSuccess "${deleted} documents are removed"
         else
             printDefault "Skip..."
