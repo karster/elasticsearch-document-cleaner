@@ -160,9 +160,9 @@ else
     if [ "$INDEX" == "all" ]; then
         printInfo "Finding documents..."
         indieces=$(getAllIndices)
-        for word in $indieces
+        for index in $indieces
         do
-            INDEX=$word
+            INDEX=$index
             deleteDocuments
         done
         
