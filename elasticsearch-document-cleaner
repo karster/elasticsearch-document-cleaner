@@ -71,6 +71,11 @@ function findIndices
     curl -XGET ${HOST}:${PORT}/_cat/indices 2>&1
 }
 
+function getAllIndices
+{
+    curl -XGET ${HOST}:${PORT}/_cat/indices 2>&1 | tail -n +4 | awk '{print $3}'
+}
+
 function deleteDocuments
 {
     count=$(getCount)
@@ -152,9 +157,20 @@ if [ "$INDEX" == "" ]; then
     printInfo "Finding indices..."
     findIndices
 else
-    printInfo "Finding documents..."
-    deleteDocuments
+    if [ "$INDEX" == "all" ]; then
+        printInfo "Finding documents..."
+        indieces=$(getAllIndices)
+        for word in $indieces
+        do
+            INDEX=$word
+            deleteDocuments
+        done
+        
+        
+    else
+        printInfo "Finding documents..."
+        deleteDocuments
+    fi
 fi
 
 exit 0
-

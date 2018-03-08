@@ -36,7 +36,7 @@ Port, default 9200.
 Host name, default "localhost".
 
 -i <string>, --index <string>
-Index name. If empty get list all indices.
+Index name. If empty get list all indices. If set "all" remove documents across all indices
 
 -f, --force
 Don't ask for confirm to delete indexes.
